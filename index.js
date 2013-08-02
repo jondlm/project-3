@@ -12,11 +12,11 @@ module.exports = function(tagMapper){
     matched = tStr.match(/{%\s*([\w\d\s\-\.]*)\s*%}/);
 
     if (matched) {
-      tag = matched.split(' ')[0];
+      tag = matched[1].split(' ')[0];
     }
-    debugger;
     if (tag && tagMapper[tag]) {
-
+      debugger;
+      tagMapper[tag](parser, matched[1]);
     }
 
     // match tags with: /{%\s*([\w\d\s\-\.]*)\s*%}/
@@ -41,6 +41,14 @@ function Parser(tagMapper){
   this.tagMap = tagMapper;
 }
 
+/*
+
+  parser.parse({
+      'endfor': endfor
+    , 'empty': empty
+  })
+
+ */
 Parser.prototype.parse = function(obj){
 
 

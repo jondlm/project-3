@@ -1,10 +1,13 @@
+// getting called with (parser, 'for item in items ')
+
+
 // an example for tag
-module.exports = function(parser, contents) { 
+module.exports = function(parser, contents) {
   var bits = contents.split(/\s+/)  // ["for", "item", "in", "items"]
-    , contextTarget = bits[1]
-    , lookupContextVariable = parser.lookup(bits[3]) 
-    , forBody
-    , emptyBody
+    , contextTarget = bits[1] // "item"
+    , lookupContextVariable = parser.lookup(bits[3]) // call parser.lookup("items") // it will get back a function that takes an obj
+    , forBody // undefined
+    , emptyBody // undefined
 
   parser.parse({
       'endfor': endfor
@@ -29,8 +32,8 @@ module.exports = function(parser, contents) {
         , isfirst: i === 0
         , islast: i === len - 1
         , length: len
-      } 
-      output.push(forBody(loopContext))   
+      }
+      output.push(forBody(loopContext))
     }
 
     return output.join('')

@@ -12,7 +12,15 @@ compile = language({
   , 'for' : for_tag
 });
 
-template = compile("template string");
+var input =
+  "<ul>"
++ "\n{% for item in items %}"
++ "\n    <li>{% if item.okay %}it's okay{% else %}it's not okay{% endif %}</li>"
++ "\n{% endfor %}"
++ "\n</ul>"
++ "\n{{ message }}";
+
+template = compile(input);
 
 template({
     items : [{okay: true}, {okay: false}]
