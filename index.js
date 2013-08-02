@@ -2,22 +2,12 @@ var tinyT = require('tiny-t')
   , objectDive = require('object-dive');
 
 
-module.exports = function(tagMapper){
+module.exports = function(map){
  return function(tStr) {
   return function(obj) {
-    var parser = new Parser(tagMapper)
-      , matched
-      , tag;
+    var parser = new Parser(map, tStr);
 
-    matched = tStr.match(/{%\s*([\w\d\s\-\.]*)\s*%}/);
-
-    if (matched) {
-      tag = matched[1].split(' ')[0]; // grab the first word in the match, like "for"
-    }
-    if (tag && tagMapper[tag]) {
-      debugger;
-      tagMapper[tag](parser, matched[1]);
-    }
+    parser.parse(map, tStr);
 
     // match tags with: /{%\s*([\w\d\s\-\.]*)\s*%}/
     
@@ -34,24 +24,38 @@ module.exports = function(tagMapper){
 /*******************************
              PARSER
 *******************************/
-function Parser(tagMapper){
+function Parser(topMap, topTemplateString){
   if (!(this instanceof Parser)){ // make the constructor "new" agnostic
-    return new Parser(tagMapper);
+    return new Parser(topMap, topTemplateString);
   }
+
+  this.topMap = topMap; // I may not need to retain the original map and template string
+  this.topTemplateString = topTemplateString;
 
   return this;
 }
+/*  parser.parse({
+        'endfor': endfor
+      , 'empty': empty
+    })   */
+Parser.prototype.parse = function(map, contents){
+  var matched
+    , tag;
+    
+  // If we got a new map, then let's use it for this parse round
+  matched = contents.match(/{%\s*([\w\d\s\-\.]*)\s*%}/);
 
-/*
-
-  parser.parse({
-      'endfor': endfor
-    , 'empty': empty
-  })
-
- */
-Parser.prototype.parse = function(obj){
-
+  if (matched) {
+    tag = matched[1].split(' ')[0]; // grab the first word in the match, like "for"
+  }
+  if (tag && map[tag]) {
+    debugger;
+    map[tag](this, matched[1]);
+  }
+  if (!matched){
+    // TODO: pipe into tinyT
+    return contents;
+  }
 
 };
 

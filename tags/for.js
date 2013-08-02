@@ -14,13 +14,17 @@ module.exports = function(parser, contents) {
     , lookupContextVariable = parser.lookup(bits[3]) // call parser.lookup("items") // it will get back a function that takes an obj
     , forBody // undefined
     , emptyBody // undefined
-
+  
+  debugger;
+  
   parser.parse({ // call the parse function with an object, hmm...
       'endfor': endfor
     , 'empty': empty
   })
 
-  return function(context) {
+  debugger;
+
+  return function(context) { // "context" is something the parser function defines
     var target = lookupContextVariable(context) // Will lookup some property on the template object input, based on the unknown context (at this point)
       , output = []
       , loopContext
