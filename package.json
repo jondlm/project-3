@@ -1,0 +1,16 @@
+{
+  "name": "crappy-t",
+  "version": "0.0.1",
+  "description": "Results for project 3",
+  "author": "Jon de la Motte",
+  "dependencies": {
+    "object-dive": "0.0.0"
+  },
+  "devDependencies": {
+    "tap": "~0.4.3"
+  },
+  "scripts": {
+    "test": "node tests/test.js"
+  },
+  "main": "./index"
+}
