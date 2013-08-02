@@ -12,7 +12,7 @@ module.exports = function(tagMapper){
     matched = tStr.match(/{%\s*([\w\d\s\-\.]*)\s*%}/);
 
     if (matched) {
-      tag = matched[1].split(' ')[0];
+      tag = matched[1].split(' ')[0]; // grab the first word in the match, like "for"
     }
     if (tag && tagMapper[tag]) {
       debugger;
@@ -38,7 +38,8 @@ function Parser(tagMapper){
   if (!(this instanceof Parser)){ // make the constructor "new" agnostic
     return new Parser(tagMapper);
   }
-  this.tagMap = tagMapper;
+
+  return this;
 }
 
 /*
