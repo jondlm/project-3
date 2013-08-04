@@ -5,24 +5,29 @@ var tap = require('tap')
   , if_tag = require('../tags/if.js')
   , for_tag = require('../tags/for.js')
   , compile
-  , template;
+  , template
+  , input;
 
 compile = language({
     'if' : if_tag
   , 'for' : for_tag
 });
 
-var input =
-  "<ul>"
-+ "\n{% for item in items %}"
-+ "\n    <li>{% if item.okay %}it's okay{% else %}it's not okay{% endif %}</li>"
-+ "\n{% endfor %}"
-+ "\n</ul>"
-+ "\n{{ message }}";
 
 template = compile(input);
 
-template({
+var r = template({
     items : [{okay: true}, {okay: false}]
   , message: "hello world"
-}) // should render the above template
+}); // should render the above template
+
+tap.test('check the for loop', function(t){
+  input = "{% for item in items %}{% item.name %}{% endfor %}";
+  template = compile(input);
+  obj = {
+    items: [{name: 'jon'}, {name: 'jon'}]
+  };
+
+  t.equal(template(obj), 'jonjon', 'ensure we compiled correctly');
+  t.end();
+});
