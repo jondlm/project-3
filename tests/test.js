@@ -4,30 +4,46 @@ var tap = require('tap')
   , language = require('../index.js')
   , if_tag = require('../tags/if.js')
   , for_tag = require('../tags/for.js')
-  , compile
-  , template
-  , input;
-
-compile = language({
+  , compile = language({
     'if' : if_tag
   , 'for' : for_tag
 });
 
 
-template = compile(input);
 
-var r = template({
-    items : [{okay: true}, {okay: false}]
-  , message: "hello world"
-}); // should render the above template
+tap.test('test the supplied example', function(t){
+  var input = ""
+    , template = compile(input)
+    , obj = {
+        items : [{okay: true}, {okay: false}]
+      , message: "hello world"
+      }
+    , result = template(obj);
 
-tap.test('check the for loop', function(t){
-  input = "{% for item in items %}{% item.name %}{% endfor %}";
-  template = compile(input);
-  obj = {
-    items: [{name: 'jon'}, {name: 'jon'}]
-  };
+  t.equal(result, '', 'full functionality test');
+  t.end();
+});
 
-  t.equal(template(obj), 'jonjon', 'ensure we compiled correctly');
+tap.test('check only the for loop', function(t){
+  var input = "{% for item in items %}{% item.name %}{% endfor %}"
+    , template = compile(input)
+    , obj = {
+        items: [{name: 'jon'}, {name: 'jon'}]
+      }
+    , result = template(obj);
+
+  t.equal(result, 'jonjon', 'basic for loop test');
+  t.end();
+});
+
+tap.test('check only the handlebar template', function(t){
+  var input = "here is {{ name }}"
+    , template = compile(input)
+    , obj = {
+        name: 'frank'
+      }
+    , result = template(obj);
+
+  t.equal(result, 'here is frank', 'basic handlebar test');
   t.end();
 });
