@@ -4,50 +4,67 @@ var tinyT = require('tiny-t')
   , objectDive = require('object-dive');
 
 
-module.exports = function(map){
- return function(inputStr) {
-  return function(inputObj) {
+module.exports = function(tags){
 
-    // var parser = new Parser(map, input);
+  var parser = new Parser(tags);
 
-    // Do you matching here, not in the parse function
-    // If we got a new map, then let's use it for this parse round
-    matched = inputStr.match(/{%\s*([\w\d\s\-\.]*)\s*%}/); // 
+  return function(inputStr) {
+    return function(inputObj) {
+      var arr = [] // arr[i].
+        , listOfFunction = []
+        , allMatches
+        , r = /{%\s*([\w\d\s\-\.]*)\s*%}/
+        , inStr = inputStr.replace(/\n/gm, ''); // strip out new lines
 
-    if (matched) {
-      tag = matched[1].split(' ')[0]; // grab the first word in the match, like "for"
-    }
-    if (tag && map[tag]) {
-      map[tag](this, matched[1]);
-    }
-    if (!matched){ // not sure about this..
-      // TODO: pipe into tinyT
-      return contents;
+      while (r.exec(inStr)){
+        var m = r.exec(inStr);
+        arr.push(m);
+        inStr = m.input.slice(m.index + m[0].length);
+      }
 
-    return renderedString; // final output
+      for (var i = arr.length - 1; i >= 0; i--) {
+        var match = arr[i];
+
+        if (match) {
+          tag = match[1].split(' ')[0];
+          debugger;
+        }
+        if (tag && tags[tag]) {
+          var temp = tags[tag](parser, match[1]);
+          listOfFunction.push(temp);
+        }
+
+      }
+      debugger;
+
+      // when all is said and done with the parser, 
+      return 'final output?'; // final output
+    };
   };
- };
 };
 
 
 /*******************************
              PARSER
 *******************************/
-function Parser(topMap, topTemplateString){
-  if (!(this instanceof Parser)){ // make the constructor "new" agnostic
-    return new Parser(topMap, topTemplateString);
+// Parser constructor
+function Parser(tags){
+  if (!(this instanceof Parser)) { // make the constructor "new" agnostic
+    return new Parser(tags);
   }
 
-  this.topMap = topMap; // I may not need to retain the original map and template string
-  this.topTemplateString = topTemplateString;
+  this.tags = tags;
 
   return this;
 }
 
-Parser.prototype.parse = function(map, contents){ //
-  var matched
-    , tag;
+Parser.prototype.parse = function(obj){ //
+  var tokens = Object.keys(obj);
 
+  // add the new tokens to our mapping 
+  tokens.forEach(function(i){
+
+  });
 
 };
 
