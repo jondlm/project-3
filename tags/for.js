@@ -9,30 +9,30 @@ module.exports = function(parser, contents) {
     , lookupContextVariable = parser.lookup(bits[3]) // call parser.lookup("items") // it will get back a function that takes an obj
     , forBody                                        // undefined
     , emptyBody;                                     // undefined
+    debugger;
 
   parser.parse({ // immediately call the parse function with an object, hmm...
       'endfor': endfor // a function that takes a "string"?
     , 'empty': empty   // a function that takes a "string", it sets the forBody and calls parser.parse({'endfor': endfor})
   });
 
-  // Doesn't get called until later
-  return function(context) { // "context" is supposed to be an object
+  // Doesn't get called until after we have our "list of functions"
+  return function(context) { // `context` must be the object that the user supplied with the values we are supposed to lookup
     // `context` should be the object that contains the items for us to look up
     var target = lookupContextVariable(context) // Lookup the "items" property on the context object
       , output = []
       , loopContext;
 
     if(!target || !target.length) {
-      return emptyBody ? emptyBody(context) : ''; // "items" property wasn't found, do something
+      return emptyBody ? emptyBody(context) : ''; // if `emptyBody` exists, return a call with `context`, else return ''
     }
 
     // "items" property was found, loop through the array and do something
 
-    // [{okay: true}, {okay: false}]
+    // target === [{okay: true}, {okay: false}]
 
     for(var i = 0, len = target.length; i < len; ++i) {
-      // First thing we do is inherit all of the tree that came before us.
-      loopContext = Object.create(context)    // keep all the old properties foud on context
+      loopContext = Object.create(context)    // clone `context` into `loopContext`
       loopContext[contextTarget] = target[i]  // set loopContext["item"] = true, the second time to false
       loopContext.forloop = {
           parent: loopContext.forloop
@@ -47,7 +47,7 @@ module.exports = function(parser, contents) {
     return output.join('')
   }
 
-  function empty(tpl) {
+  function empty(tpl) { // tpl must be a function sometimes
     forBody = tpl
     parser.parse({'endfor': endfor})
   }

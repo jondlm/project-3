@@ -17,6 +17,14 @@ tap.test('make sure we can find non-nested properties', function(t){
   t.end();
 });
 
+tap.test('ensure arrays are returned properly', function(t){
+  var find = objectSearch('findMe')
+    , found = find({findMe: [1,2,3]});
+
+  t.deepEqual(found, [1,2,3], 'check the returned array is as expected');
+  t.end();
+});
+
 tap.test('make sure undefined is properly returned when a property isnt found', function(t){
   var find = objectSearch('inconsequential')
     , notFound = find({}) || find() || find(null) || find(undefined);
