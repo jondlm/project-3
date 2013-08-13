@@ -12,9 +12,22 @@ module.exports = function(parser, contents) {
     debugger;
 
   parser.parse({ // immediately call the parse function with an object, hmm...
-      'endfor': endfor // a function that takes a "string"?
-    , 'empty': empty   // a function that takes a "string", it sets the forBody and calls parser.parse({'endfor': endfor})
+      'endfor': endfor
+    , 'empty': empty
   });
+
+  function endfor(tpl) {
+    if(forBody) {
+      emptyBody = tpl
+    } else {
+      forBody = tpl
+    }
+  }
+
+  function empty(tpl) { // tpl must be a function sometimes
+    forBody = tpl
+    parser.parse({'endfor': endfor})
+  }
 
   // Doesn't get called until after we have our "list of functions"
   return function(context) { // `context` must be the object that the user supplied with the values we are supposed to lookup
@@ -42,21 +55,20 @@ module.exports = function(parser, contents) {
         , length: len           // 2
       }
       output.push(forBody(loopContext))
+      /**
+       * loopContext = {
+       *   item: true,
+       *   parent: {},
+       *   index: 0,
+       *   isfirst: true,
+       *   islast: false,
+       *   length: 2
+       * 
+       * }
+       */
     }
 
     return output.join('')
   }
 
-  function empty(tpl) { // tpl must be a function sometimes
-    forBody = tpl
-    parser.parse({'endfor': endfor})
-  }
-
-  function endfor(tpl) {
-    if(forBody) {
-      emptyBody = tpl
-    } else {
-      forBody = tpl
-    }
-  }
 }

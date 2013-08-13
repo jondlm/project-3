@@ -9,43 +9,8 @@ var tinyT = require('tiny-t')
 module.exports = function(tags){
   return function(inputStr) {
     return function(inputObj) {
-      var regex = /{%\s*([\w\d\s\-\.]*)\s*%}/
-        , str = inputStr.replace(/\n/gm, '') // strip out new lines
-        , parser = new Parser(tags, str)
-        , match = regex.exec(inputStr)
-        , tag;
-
-        console.log(parser.parse(tags)(inputObj));
-
-      // var arr = [] // arr[i].
-      //   , listOfFunction = []
-      //   , allMatches
-      //   , r = /{%\s*([\w\d\s\-\.]*)\s*%}/
-      //   , inStr = inputStr.replace(/\n/gm, ''); // strip out new lines
-
-      // while (r.exec(inStr)){
-      //   var m = r.exec(inStr);
-      //   arr.push(m);
-      //   inStr = m.input.slice(m.index + m[0].length);
-      // }
-
-      // for (var i = arr.length - 1; i >= 0; i--) {
-      //   var match = arr[i];
-
-      //   if (match) {
-      //     tag = match[1].split(' ')[0];
-      //     debugger;
-      //   }
-      //   if (tag && tags[tag]) {
-      //     var temp = tags[tag](parser, match[1]);
-      //     listOfFunction.push(temp);
-      //   }
-
-      // }
-      // debugger;
-
-      // when all is said and done with the parser, 
-      return 'final output?'; // final output
+      var parser = new Parser(tags, str)
+      return parser.start();
     };
   };
 };
@@ -61,7 +26,7 @@ function Parser(tags, userInput){
   }
 
   this.regex = /{%\s*([\w\d\s\-\.]*)\s*%}/;
-  this.userInput = userInput;
+  this.userInput = userInput.replace(/\n/gm, ''); // remove new lines
   this.tags = tags;
   this.output = [];
   this.at = 0; // starting point
@@ -69,22 +34,34 @@ function Parser(tags, userInput){
   return this;
 }
 
+// Kick-off the parsing
+Parser.prototype.start = function() {
+  var r = this.regex
+    , s = this.userInput
+    , t = this.tags
+    , o = [];
+
+  while (r.exec(s.slice(this.at))){
+    var match = r.exec(s.slice(this.at));
+    var tag = undefined;
+
+    if (match) {
+      tag = match[1].split(' ')[0]; // "for"
+      this.at = this.at + match[0].length; // advance `at` counter
+    }
+    if (tag && t[tag]) {
+      var result = t[tag](this, match[1]);
+      o.push(result);
+    }
+    if (!match) {
+      return s.slice(this.at); // NOT SURE
+    }
+  }
+  return o;
+}
+
 Parser.prototype.parse = function(obj){ //
-  var match = this.regex.exec(this.userInput.slice(this.at))
-    , tag;
-
-  // when i'm passed on `obj` I need to regex for one of those matches...
-
-  if (match) {
-    tag = match[1].split(' ')[0]; // "for"
-    this.at = this.at + match[0].length; // move position past current token
-  }
-  if (tag && this.tags[tag]) {
-    var whatIsThis = this.tags[tag](this, match[1]);
-    return whatIsThis;
-  } else if (tag && obj[tag]) {
-    obj[tag](this, match[1]);
-  }
+  
 };
 
 Parser.prototype.lookup = function(str){
